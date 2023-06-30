@@ -1,0 +1,41 @@
+# docker compose file for running a 3-node PostgreSQL cluster
+# with 3-node etcd cluster as the DCS and one haproxy node
+version: "3.6"
+
+networks:
+    demo:
+
+services:
+    destination:
+        image: postgres:15
+        networks: [ demo ]
+        hostname: destination
+        container_name: destination
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+          - POSTGRES_DB=destination_db
+        ports:
+          - 5432:5432
+        networks: [ demo ]
+        
+    pgadmin:
+        container_name: pgadmin
+        image: dpage/pgadmin4
+        environment:
+          PGADMIN_DEFAULT_EMAIL: 'pgadmin4@pgadmin.org'
+          PGADMIN_DEFAULT_PASSWORD: 'admin'
+          PGADMIN_CONFIG_SERVER_MODE: 'False'
+          PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+        volumes:
+           - type: bind
+             source: ./pgAdmin/servers.json
+             target: /pgadmin4/servers.json
+           - type: bind
+             source: ./pgAdmin/pgpass
+             target: /pgpass
+        ports:
+          - "5050:80"
+        networks: [ demo ]
+        restart: unless-stopped
+

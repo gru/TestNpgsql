@@ -1,0 +1,2 @@
+haproxy:5000:postgres:postgres:postgres
+destination:5432:postgres:postgres:postgres
